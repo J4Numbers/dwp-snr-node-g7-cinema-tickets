@@ -36,7 +36,6 @@ When("a request to purchase tickets is made", () => {
       ...world.ticketRequest,
     );
   } catch (invalidPurchase) {
-    console.log(invalidPurchase);
     world.exception = invalidPurchase;
   }
 });
