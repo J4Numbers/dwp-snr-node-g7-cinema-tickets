@@ -1,5 +1,8 @@
 .swp
 .DS_Store
+.coverage
+
+node_modules
 
 # IntelliJ project files
 .idea

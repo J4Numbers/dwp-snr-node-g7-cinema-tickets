@@ -9,15 +9,15 @@ for the different tests.
 ## Testing criteria
 
 The tests are split into different criteria according to the rules. These criteria may include more
-than one test around negative conditions and edge cases.
+than one test around negative conditions and edge cases. The tests themselves are then split out
+between the code interface, and an API test.
 
 ### At least one adult ticket should always be bought
 
 ```gherkin
-Feature: At least one adult ticket should always be bought
-  
-  Background: When buying tickets from the cinema, there is no possible combination where an adult
-    does not buy a ticket. They will either be on their own, or accompanying a child or an infant.
+Feature: At least one adult ticket should always be bought. When buying tickets from the cinema,
+  there is no possible combination where an adult does not buy a ticket. They will either be on
+  their own, or accompanying a child or an infant.
     
   Scenario: When no tickets are bought, then an error should be displayed
     Given no tickets are being bought
@@ -34,36 +34,40 @@ Feature: At least one adult ticket should always be bought
     
     Examples: 
       | number | type   |
-      | 1      | child  |
-      | 1      | infant |
+      | 1      | CHILD  |
+      | 1      | INFANT |
 
   Scenario: When a ticket for an adult is bought, then the purchase should go through successfully 
-    Given I request 1 adult ticket
+    Given I request 1 ADULT ticket
     When a request to purchase tickets is made
     Then a 200 status should be presented
     And the receipt of the purchase should be returned
 
-  Scenario: When a ticket for an adult is bought, I should be able to also buy child tickets
-    Given I request 1 adult ticket
-    And I request <number> <type> tickets
+  Scenario Outline: When a ticket for an adult is bought, I should be able to also buy child tickets
+    Given I request 1 ADULT ticket
+    And I request <number> CHILD tickets
     When a request to purchase tickets is made
     Then a 200 status should be presented
     And the receipt of the purchase should be returned
+
+    Examples: 
+      | number |
+      | 1      |
+      | 5      |
 ```
 
 ### All infants should be accompanied by an adult
 
 ```gherkin
-Feature: All infants should be accompanied by a dedicated caretaker adult
-
-  Background: This is an assumption on the base requirements for this project. We state that one
-    adult can only fit one infant on their lap at any one time while being able to look after them.
-    If two infants are going to request a ticket, then there must be two adults looking after them.
+Feature: All infants should be accompanied by a dedicated caretaker adult. This is an assumption
+  on the base requirements for this project. We state that one adult can only fit one infant on
+  their lap at any one time while being able to look after them. If two infants are going to
+  request a ticket, then there must be two adults looking after them.
 
   Scenario Outline: When there are fewer adults than infants, then an error requiring the minimum
     number of adults should be shown
-    Given I request <adultNumber> adult tickets
-    And I request <infantNumber> infant tickets
+    Given I request <adultNumber> ADULT tickets
+    And I request <infantNumber> INFANT tickets
     When a request to purchase tickets is made
     Then a 400 status exception should be presented
     And an error for requiring at least <infantNumber> adult ticket should be shown
@@ -76,8 +80,8 @@ Feature: All infants should be accompanied by a dedicated caretaker adult
 
   Scenario Outline: When there are more or equal numbers of adults to infants, then the tickets
     should be successfully booked, but with seat reservations only for the adults
-    Given I request <adultNumber> adult tickets
-    And I request <infantNumber> infant tickets
+    Given I request <adultNumber> ADULT tickets
+    And I request <infantNumber> INFANT tickets
     When a request to purchase tickets is made
     Then a 200 status should be presented
     And the receipt of the purchase should be returned
@@ -94,15 +98,14 @@ Feature: All infants should be accompanied by a dedicated caretaker adult
 ### At most 25 tickets can be bought at one time
 
 ```gherkin
-Feature: At most, 25 tickets can be bought during a single transaction
-
-  Background: To prevent overbooking, there is a hard limit of the number of tickets that can be
-    bought at once. At most, 25 tickets can be booked, and this number includes infant tickets.
+Feature: At most, 25 tickets can be bought during a single transaction. To prevent overbooking,
+  there is a hard limit of the number of tickets that can be bought at once. At most, 25 tickets
+  can be booked, and this number includes infant tickets.
 
   Scenario Outline: When I buy 25 tickets or fewer, then the transaction is successful
-    Given I request <adultNumber> adult tickets
-    And I request <childNumber> child tickets
-    And I request <infantNumber> infant tickets
+    Given I request <adultNumber> ADULT tickets
+    And I request <childNumber> CHILD tickets
+    And I request <infantNumber> INFANT tickets
     When a request to purchase tickets is made
     Then a 200 status should be presented
     And the receipt of the purchase should be returned
@@ -117,9 +120,9 @@ Feature: At most, 25 tickets can be bought during a single transaction
 
   Scenario Outline: When I buy more than 25 tickets, then the transaction fails with a request to
     reduce the amount of tickets purchased 
-    Given I request <adultNumber> adult tickets
-    And I request <childNumber> child tickets
-    And I request <infantNumber> infant tickets
+    Given I request <adultNumber> ADULT tickets
+    And I request <childNumber> CHILD tickets
+    And I request <infantNumber> INFANT tickets
     When a request to purchase tickets is made
     Then a 400 status exception should be presented
     And an error showing that <totalNumber> tickets is above the max of 25 should be shown
