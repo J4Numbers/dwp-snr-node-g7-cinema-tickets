@@ -23,11 +23,13 @@ Feature: All infants should be accompanied by a dedicated caretaker adult. This 
     And I request <infantNumber> INFANT tickets
     When a request to purchase tickets is made
     Then the receipt of the purchase should be returned
+    And <totalNumber> tickets should have been ordered
+    And the order total should have equalled <totalCost>
     And <adultNumber> seats should be reserved
 
     Examples:
-      | adultNumber | infantNumber |
-      | 1           | 1            |
-      | 2           | 2            |
-      | 5           | 5            |
-      | 5           | 1            |
+      | adultNumber | infantNumber | totalNumber | totalCost |
+      | 1           | 1            | 2           | 25        |
+      | 2           | 2            | 4           | 50        |
+      | 5           | 5            | 10          | 125       |
+      | 5           | 1            | 6           | 125       |

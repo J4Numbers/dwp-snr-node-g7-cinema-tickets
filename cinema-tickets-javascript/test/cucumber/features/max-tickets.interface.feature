@@ -9,14 +9,16 @@ Feature: At most, 25 tickets can be bought during a single transaction. To preve
     And I request <infantNumber> INFANT tickets
     When a request to purchase tickets is made
     Then the receipt of the purchase should be returned
-    And <totalNumber> seats should be reserved
+    And <totalNumber> tickets should have been ordered
+    And the order total should have equalled <totalCost>
+    And <totalSeats> seats should be reserved
 
     Examples:
-      | adultNumber | childNumber | infantNumber | totalNumber |
-      | 25          | 0           | 0            | 25          |
-      | 20          | 3           | 2            | 25          |
-      | 10          | 5           | 10           | 25          |
-      | 1           | 24          | 0            | 25          |
+      | adultNumber | childNumber | infantNumber | totalNumber | totalCost | totalSeats |
+      | 25          | 0           | 0            | 25          | 625       | 25         |
+      | 20          | 3           | 2            | 25          | 545       | 23         |
+      | 10          | 5           | 10           | 25          | 325       | 15         |
+      | 1           | 24          | 0            | 25          | 385       | 25         |
 
   Scenario Outline: When I buy more than 25 tickets, then the transaction fails with a request to
   reduce the amount of tickets purchased
