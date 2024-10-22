@@ -1,6 +1,6 @@
 # Cinema tickets
 
-This application is a NodeJS project that exists as a stateless back-end service to purchase
+This application is a Node.js project that exists as a stateless back-end service to purchase
 tickets from a cinema.
 
 The task that this service has been created to fill can be found in [1][task.README.md]
@@ -25,7 +25,7 @@ All requests require the following information:
   * And a `type` field with the ticket type - which can be 'INFANT', 'CHILD', or 'ADULT'
 
 Successful responses will include the following:
-* Number and type of tickets booked successfully
+* Number of tickets booked successfully
 * Number of seats reserved
 * Total amount paid
 
@@ -43,3 +43,9 @@ The following rules apply for this application
 For a more in-depth look at the testing criteria and planned tests, visit [testing.README.md][2]
 
 [2]: testing.README.md
+
+To run the tests within this repository, the following command can be used:
+
+```bash
+npm t
+```

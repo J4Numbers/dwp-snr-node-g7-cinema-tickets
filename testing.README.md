@@ -6,10 +6,27 @@ correctness and resilience.
 This project follows TDD and BDD practices, and the different scenarios have been laid out below
 for the different tests.
 
-## Testing criteria
+## Unit tests
+
+The unit tests are written under the mocha framework, with c8 as a coverage tool. They can be run
+with:
+
+```bash
+npm run test:unit # For the main unit tests
+npm run cover     # For coverage checks
+```
+
+## Behaviour testing criteria
 
 The tests are split into different criteria according to the rules. These criteria may include more
 than one test around negative conditions and edge cases.
+
+These tests are written in gherkin and operated using Cucumber. They can be run with the following
+command:
+
+```bash
+npm run test:interface
+```
 
 ### At least one adult ticket should always be bought
 
