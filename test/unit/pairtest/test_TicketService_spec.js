@@ -153,7 +153,13 @@ describe("The cinema ticket service", function () {
     });
 
     describe("The list of tickets", function () {
-      it("Should error when no ticket requests are provided", function () {
+      it("Should error when no ticket requests are provided implicitly", function () {
+        expect(() => ticketService.purchaseTickets(1)).to.throw(
+          /at least one ticket must be purchased/i,
+        );
+      });
+
+      it("Should error when no ticket requests are provided explicitly", function () {
         const tickets = [];
         expect(() => ticketService.purchaseTickets(1, ...tickets)).to.throw(
           /at least one ticket must be purchased/i,
