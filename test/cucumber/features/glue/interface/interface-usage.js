@@ -13,7 +13,7 @@ Given("no tickets are being bought", () => {
   // Do nothing
 });
 
-Given(/^I request ([0-9]+) (.*) tickets?$/i, (ticketCount, ticketType) => {
+Given(/^I request (-?[0-9]+) (.*) tickets?$/i, (ticketCount, ticketType) => {
   const parsedCount = parseInt(ticketCount, 10);
   if (parsedCount > 0) {
     world.ticketRequest.push({ count: parsedCount, type: ticketType });
@@ -21,7 +21,7 @@ Given(/^I request ([0-9]+) (.*) tickets?$/i, (ticketCount, ticketType) => {
 });
 
 Given(
-  /^I explicitly request ([0-9]+) (.*) tickets?$/i,
+  /^I explicitly request (-?[0-9]+) (.*) tickets?$/i,
   (ticketCount, ticketType) => {
     world.ticketRequest.push({
       count: parseInt(ticketCount, 10),
@@ -44,6 +44,12 @@ When("a request to purchase tickets is made", () => {
 Then("an error for no tickets purchased should be thrown", () => {
   expect(world.exception.message).to.equal(
     "At least one ticket must be purchased",
+  );
+});
+
+Then("an error that an invalid ticket was presented should be shown", () => {
+  expect(world.exception.message).to.equal(
+      "The ticket you attempted to buy was invalid. The count must be numeric and greater than 0, and the type must be one of 'INFANT', 'CHILD', or 'ADULT'."
   );
 });
 

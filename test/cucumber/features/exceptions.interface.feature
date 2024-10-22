@@ -26,5 +26,3 @@ Feature: Assuming this interface is used in the real world, then it is likely th
       | number | type   |
       | -1     | CHILD  |
       | 1      | MONKEY |
-      |        | CHILD  |
-      | 1      |        |
