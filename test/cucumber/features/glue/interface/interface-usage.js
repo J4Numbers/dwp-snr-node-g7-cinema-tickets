@@ -1,10 +1,16 @@
 import { Given, When, Then, Before, world } from "@cucumber/cucumber";
 import { expect } from "chai";
 import TicketService from "../../../../../src/pairtest/TicketService.js";
-import TicketTypeRequest from "../../../../../src/pairtest/lib/TicketTypeRequest.js";
+import TicketPaymentService from "../../../../../src/thirdparty/paymentgateway/TicketPaymentService.js";
+import SeatReservationService from "../../../../../src/thirdparty/seatbooking/SeatReservationService.js";
 
 Before({ name: "Setting up basic parameters" }, () => {
-  world.ticketService = new TicketService();
+  world.paymentService = new TicketPaymentService();
+  world.reservationService = new SeatReservationService();
+  world.ticketService = new TicketService(
+    world.paymentService,
+    world.reservationService,
+  );
   world.accountId = 12345;
   world.ticketRequest = [];
 });
@@ -49,7 +55,7 @@ Then("an error for no tickets purchased should be thrown", () => {
 
 Then("an error that an invalid ticket was presented should be shown", () => {
   expect(world.exception.message).to.equal(
-      "The ticket you attempted to buy was invalid. The count must be numeric and greater than 0, and the type must be one of 'INFANT', 'CHILD', or 'ADULT'."
+    "The ticket you attempted to buy was invalid. The count must be numeric and greater than 0, and the type must be one of 'INFANT', 'CHILD', or 'ADULT'.",
   );
 });
 

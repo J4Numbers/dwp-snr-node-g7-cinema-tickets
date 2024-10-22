@@ -1,11 +1,21 @@
+import sinon from "sinon";
+
 import TicketService from "../../../src/pairtest/TicketService.js";
+import TicketPaymentService from "../../../src/thirdparty/paymentgateway/TicketPaymentService.js";
+import SeatReservationService from "../../../src/thirdparty/seatbooking/SeatReservationService.js";
 
 describe("The cinema ticket service", function () {
   let ticketService;
+  let paymentStub;
+  let reservationStub;
 
   before(function () {
-    ticketService = new TicketService();
+    paymentStub = sinon.createStubInstance(TicketPaymentService);
+    reservationStub = sinon.createStubInstance(SeatReservationService);
+    ticketService = new TicketService(paymentStub, reservationStub);
   });
+
+  after(function () {});
 
   describe("Regular usage of the interface", function () {
     describe("Minimum adult ticket usage", function () {

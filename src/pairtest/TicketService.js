@@ -1,16 +1,19 @@
 import TicketTypeRequest from "./lib/TicketTypeRequest.js";
 import InvalidPurchaseException from "./lib/InvalidPurchaseException.js";
-import TicketPaymentService from "../thirdparty/paymentgateway/TicketPaymentService.js";
-import SeatReservationService from "../thirdparty/seatbooking/SeatReservationService.js";
 import TicketReservationResponse from "./lib/TicketReservationResponse.js";
 
 export default class TicketService {
   /**
    * Instantiation class to load in the payment and reservation services.
+   *
+   * @param paymentService {TicketPaymentService} - The payment service for managing
+   * ticket payments.
+   * @param reservationService {SeatReservationService} - The reservation service
+   * for managing seat bookings.
    */
-  constructor() {
-    this._paymentService = new TicketPaymentService();
-    this._reservationService = new SeatReservationService();
+  constructor(paymentService, reservationService) {
+    this._paymentService = paymentService;
+    this._reservationService = reservationService;
   }
 
   /**
