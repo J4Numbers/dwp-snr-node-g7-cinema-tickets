@@ -142,33 +142,40 @@ The above scenarios go into the main business criteria for the application, but 
 what some of the edge cases are which should always result in a failure.
 
 ```gherkin
-Feature: Non-compliant requests should be rejected from the cinema
+Feature: Assuming this interface is used in the real world, then it is likely that there will
+  always be some potential for bad data being presented to the interface. We need to ensure that
+  this bad data is caught and appropriate feedback is given to the users in the presence of this
+  bad data.
 
-  Background: The API for this service requests a number of data items. However, the user does not
-    have to follow this request and can instead throw complete garbage at the API. This set of tests
-    exists to highlight the different ways those can happen and to reject each and every one of
-    them.
-
-  Scenario Outline: Explicitly requesting 0 tickets is exactly the same as requesting no tickets,
-    which is a failure as per criteria 1.
+  Scenario Outline: When no tickets are requested - implicitly or explicitly - then an error
+  should be presented requesting at least one ticket to be purchased.
     Given I explicitly request <number> <type> tickets
     When a request to purchase tickets is made
-    Then a 400 status exception should be presented
-    And an error for no tickets purchased be shown
+    Then an error that an invalid ticket was presented should be shown with the detail of <errorDetail>
 
     Examples:
-      | number | type   |
-      | 0      | adult  |
-      | 0      | child  |
-      | 0      | infant |
+      | number | type   | errorDetail                           |
+      | 0      | ADULT  | count must be a number greater than 0 |
+      | 0      | CHILD  | count must be a number greater than 0 |
+      | 0      | INFANT | count must be a number greater than 0 |
+
+  Scenario Outline: When invalid tickets are attempted, then an error giving information on what
+  a valid ticket looks like should be provided.
+    Given I explicitly request <number> <type> tickets
+    When a request to purchase tickets is made
+    Then an error that an invalid ticket was presented should be shown with the detail of <errorDetail>
+
+    Examples:
+      | number | type   | errorDetail                           |
+      | -1     | CHILD  | count must be a number greater than 0 |
+      | 1      | MONKEY | type must be ADULT, CHILD, or INFANT  |
 
   Scenario Outline: When presenting an invalid account code, the service should state that the account is
-    invalid
-    Given I request 1 adult ticket
-    And my account code is <code>
+  invalid
+    Given I request 1 ADULT ticket
+    And my account id is <code>
     When a request to purchase tickets is made
-    Then a 400 status exception should be presented
-    And an error for an invalid account code is shown
+    Then an error that an invalid account id was presented should be shown
 
     Examples:
       | code |

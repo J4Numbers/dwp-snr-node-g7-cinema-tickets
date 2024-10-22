@@ -8,7 +8,7 @@ describe("The ticket type request object", function () {
   });
 
   it("Should reject creating an object with a non-valid type", function () {
-    expect(() => new TicketTypeRequest("SENIOR",1,)).to.Throw(
+    expect(() => new TicketTypeRequest("SENIOR", 1)).to.Throw(
       /type must be ADULT, CHILD, or INFANT/i,
     );
   });

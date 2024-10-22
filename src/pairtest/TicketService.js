@@ -37,7 +37,7 @@ export default class TicketService {
       accountId < 1
     ) {
       throw new InvalidPurchaseException(
-        "Account ID must be a non-negative number above 0.",
+        "Account ID must be a non-negative number above 0",
       );
     }
   }

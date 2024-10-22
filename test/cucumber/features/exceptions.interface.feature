@@ -26,3 +26,17 @@ Feature: Assuming this interface is used in the real world, then it is likely th
       | number | type   | errorDetail                           |
       | -1     | CHILD  | count must be a number greater than 0 |
       | 1      | MONKEY | type must be ADULT, CHILD, or INFANT  |
+
+  Scenario Outline: When presenting an invalid account code, the service should state that the account is
+    invalid
+    Given I request 1 ADULT ticket
+    And my account id is <code>
+    When a request to purchase tickets is made
+    Then an error that an invalid account id was presented should be shown
+
+    Examples:
+      | code |
+      | 0    |
+      | -1   |
+      | 0.5  |
+      | hi   |

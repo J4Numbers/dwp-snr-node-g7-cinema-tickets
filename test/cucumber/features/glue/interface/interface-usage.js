@@ -15,6 +15,14 @@ Before({ name: "Setting up basic parameters" }, () => {
   world.ticketRequest = [];
 });
 
+Given(/my account id is (.*)/, (acctId) => {
+  if (isNaN(acctId)) {
+    world.accountId = acctId;
+  } else {
+    world.accountId = parseInt(acctId, 10);
+  }
+});
+
 Given("no tickets are being bought", () => {
   // Do nothing
 });
@@ -52,6 +60,15 @@ Then("an error for no tickets purchased should be thrown", () => {
     "At least one ticket must be purchased",
   );
 });
+
+Then(
+  /an error that an invalid account id was presented should be shown/,
+  () => {
+    expect(world.exception.message).to.equal(
+      `Account ID must be a non-negative number above 0`,
+    );
+  },
+);
 
 Then(
   /an error that an invalid ticket was presented should be shown with the detail of (.*)/,
