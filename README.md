@@ -3,17 +3,17 @@
 This application is a Node.js project that exists as a stateless back-end service to purchase
 tickets from a cinema.
 
-The task that this service has been created to fill can be found in [1][task.README.md]
+The task that this service has been created to fill can be found in [task.README.md][1]
 
 [1]: task.README.md
 
 ## How to run
 
-To run the application locally, run the following command:
+This application is independent and does not have a start script by itself. It is designed to
+be imported by other applications who will use it to their own ends.
 
-```bash
-npm run start
-```
+The [testing.README.md][2] file goes into some detail as to how the project can be run for tests,
+but all tests there will require `npm i` to be run prior to running tests.
 
 ## Requests
 

@@ -30,6 +30,16 @@ export default class TicketService {
     return baseMap;
   }
 
+  /**
+   * Given an accountId from the user, confirm whether this is a valid accountId
+   * for our use cases, and if not, throw an invalid purchase exception.
+   *
+   * @private
+   * @param accountId {number} - A numeric account ID that we're validating.
+   * @throws {InvalidPurchaseException} - Thrown if the provided account ID is
+   * not a valid account ID (i.e. non-numeric, undefined, or not a positive
+   * integer)
+   */
   _validateAccountId(accountId) {
     if (
       accountId === undefined ||
@@ -42,6 +52,19 @@ export default class TicketService {
     }
   }
 
+  /**
+   * Migrate the list of input tickets into their valid forms as per our data
+   * definition (i.e. a list of {TicketTypeRequest}). Along the way, confirm
+   * that all input tickets are valid.
+   *
+   * @private
+   * @param ticketPurchaseList {Array} The list of tickets input to the
+   * interface, no matter what they might contain.
+   * @returns {TicketTypeRequest[]} The list of discovered tickets that
+   * we can feed into the rest of the interface.
+   * @throws {InvalidPurchaseException} - Thrown if any of the provided tickets
+   * are not valid when being converted into TicketTypeRequests.
+   */
   _migrateTicketList(ticketPurchaseList) {
     if (!Array.isArray(ticketPurchaseList)) {
       throw new InvalidPurchaseException(
