@@ -3,8 +3,6 @@ Feature: At least one adult ticket should always be bought. When buying tickets 
   there is no possible combination where an adult does not buy a ticket. They will either be on
   their own, or accompanying a child or an infant.
 
-  Background:
-
   Scenario: When no tickets are bought, then an error should be displayed
     Given no tickets are being bought
     When a request to purchase tickets is made

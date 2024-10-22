@@ -1,52 +1,45 @@
-# Objective
+# Cinema tickets
 
-This is a coding exercise which will allow you to demonstrate how you code and your approach to a given problem.
+This application is a NodeJS project that exists as a stateless back-end service to purchase
+tickets from a cinema.
 
-You will be assessed on:
+The task that this service has been created to fill can be found in [1][task.README.md]
 
-- Your ability to write clean, well-tested and reusable code.
-- How you have ensured the following business rules are correctly met.
+[1]: task.README.md
 
-# Business Rules
+## How to run
 
-- There are 3 types of tickets i.e. Infant, Child, and Adult.
-- The ticket prices are based on the type of ticket (see table below).
-- The ticket purchaser declares how many and what type of tickets they want to buy.
-- Multiple tickets can be purchased at any given time.
-- Only a maximum of 25 tickets that can be purchased at a time.
-- Infants do not pay for a ticket and are not allocated a seat. They will be sitting on an Adult's lap.
-- Child and Infant tickets cannot be purchased without purchasing an Adult ticket.
+To run the application locally, run the following command:
 
-| Ticket Type | Price |
-|-------------|-------|
-| INFANT      | £0    |
-| CHILD       | £15   |
-| ADULT       | £25   |
+```bash
+npm run start
+```
 
-- There is an existing `TicketPaymentService` responsible for taking payments.
-- There is an existing `SeatReservationService` responsible for reserving seats.
+## Requests
 
-## Constraints
+All requests require the following information:
 
-- The TicketService interface CANNOT be modified.
-- The code in the thirdparty.* packages CANNOT be modified.
-- The `TicketTypeRequest` MUST be an immutable object.
+* Account number for purchasing tickets
+* A list of requested tickets
+  * Those tickets should contain a `count` field with the number of requested tickets
+  * And a `type` field with the ticket type - which can be 'INFANT', 'CHILD', or 'ADULT'
 
-## Assumptions
+Successful responses will include the following:
+* Number and type of tickets booked successfully
+* Number of seats reserved
+* Total amount paid
 
-You can assume:
+## Rules
 
-- All accounts with an id greater than zero are valid. They also have sufficient funds to pay for any no of tickets.
-- The `TicketPaymentService` implementation is an external provider with no defects. You do not need to worry about how the actual payment happens.
-- The payment will always go through once a payment request has been made to the `TicketPaymentService`.
-- The `SeatReservationService` implementation is an external provider with no defects. You do not need to worry about how the seat reservation algorithm works.
-- The seat will always be reserved once a reservation request has been made to the `SeatReservationService`.
+The following rules apply for this application
 
-## Your Task
+- All purchases _must_ include at least 1 adult ticket
+- The maximum number of infant tickets purchasable in a single transaction, is the number of adults
+  who are buying a ticket. Only one infant can be sat on an adult's lap at once.
+- A cumulative total of 25 tickets is the maximum limit in a single transaction.
 
-Provide a working implementation of a `TicketService` that:
+## Testing
 
-- Considers the above objective, business rules, constraints & assumptions.
-- Calculates the correct amount for the requested tickets and makes a payment request to the `TicketPaymentService`.
-- Calculates the correct no of seats to reserve and makes a seat reservation request to the `SeatReservationService`.
-- Rejects any invalid ticket purchase requests. It is up to you to identify what should be deemed as an invalid purchase request.
+For a more in-depth look at the testing criteria and planned tests, visit [testing.README.md][2]
+
+[2]: testing.README.md

@@ -9,8 +9,7 @@ for the different tests.
 ## Testing criteria
 
 The tests are split into different criteria according to the rules. These criteria may include more
-than one test around negative conditions and edge cases. The tests themselves are then split out
-between the code interface, and an API test.
+than one test around negative conditions and edge cases.
 
 ### At least one adult ticket should always be bought
 
@@ -18,42 +17,44 @@ between the code interface, and an API test.
 Feature: At least one adult ticket should always be bought. When buying tickets from the cinema,
   there is no possible combination where an adult does not buy a ticket. They will either be on
   their own, or accompanying a child or an infant.
-    
+
   Scenario: When no tickets are bought, then an error should be displayed
     Given no tickets are being bought
     When a request to purchase tickets is made
-    Then a 400 status exception should be presented
-    And an error for no tickets purchased be shown
+    Then an error for no tickets purchased should be thrown
 
   Scenario Outline: When tickets are purchased without an adult, then an error for requiring at
-    least one adult should be displayed.
+  least one adult should be displayed.
     Given I request <number> <type> tickets
     When a request to purchase tickets is made
-    Then a 400 status exception should be presented
-    And an error for requiring at least 1 adult ticket should be shown
-    
-    Examples: 
+    Then an error for requiring at least 1 adult ticket should be thrown
+
+    Examples:
       | number | type   |
       | 1      | CHILD  |
       | 1      | INFANT |
 
-  Scenario: When a ticket for an adult is bought, then the purchase should go through successfully 
+  Scenario: When a ticket for an adult is bought, then the purchase should go through successfully
     Given I request 1 ADULT ticket
     When a request to purchase tickets is made
-    Then a 200 status should be presented
-    And the receipt of the purchase should be returned
+    Then the receipt of the purchase should be returned
+    And 1 ticket should have been ordered
+    And the order total should have equalled 25
+    And 1 seat should be reserved
 
   Scenario Outline: When a ticket for an adult is bought, I should be able to also buy child tickets
     Given I request 1 ADULT ticket
     And I request <number> CHILD tickets
     When a request to purchase tickets is made
-    Then a 200 status should be presented
-    And the receipt of the purchase should be returned
+    Then the receipt of the purchase should be returned
+    And <totalTickets> tickets should have been ordered
+    And the order total should have equalled <totalCost>
+    And <totalSeats> seats should be reserved
 
-    Examples: 
-      | number |
-      | 1      |
-      | 5      |
+    Examples:
+      | number | totalTickets | totalCost | totalSeats |
+      | 1      | 2            | 40        | 2          |
+      | 5      | 6            | 100       | 6          |
 ```
 
 ### All infants should be accompanied by an adult
@@ -65,34 +66,34 @@ Feature: All infants should be accompanied by a dedicated caretaker adult. This 
   request a ticket, then there must be two adults looking after them.
 
   Scenario Outline: When there are fewer adults than infants, then an error requiring the minimum
-    number of adults should be shown
+  number of adults should be shown
     Given I request <adultNumber> ADULT tickets
     And I request <infantNumber> INFANT tickets
     When a request to purchase tickets is made
-    Then a 400 status exception should be presented
-    And an error for requiring at least <infantNumber> adult ticket should be shown
+    Then an error for requiring at least <infantNumber> adult tickets should be thrown
 
-    Examples: 
+    Examples:
       | adultNumber | infantNumber |
       | 1           | 2            |
       | 2           | 3            |
       | 1           | 5            |
 
   Scenario Outline: When there are more or equal numbers of adults to infants, then the tickets
-    should be successfully booked, but with seat reservations only for the adults
+  should be successfully booked, but with seat reservations only for the adults
     Given I request <adultNumber> ADULT tickets
     And I request <infantNumber> INFANT tickets
     When a request to purchase tickets is made
-    Then a 200 status should be presented
-    And the receipt of the purchase should be returned
+    Then the receipt of the purchase should be returned
+    And <totalNumber> tickets should have been ordered
+    And the order total should have equalled <totalCost>
     And <adultNumber> seats should be reserved
 
     Examples:
-      | adultNumber | infantNumber |
-      | 1           | 1            |
-      | 2           | 2            |
-      | 5           | 5            |
-      | 5           | 1            |
+      | adultNumber | infantNumber | totalNumber | totalCost |
+      | 1           | 1            | 2           | 25        |
+      | 2           | 2            | 4           | 50        |
+      | 5           | 5            | 10          | 125       |
+      | 5           | 1            | 6           | 125       |
 ```
 
 ### At most 25 tickets can be bought at one time
@@ -107,25 +108,25 @@ Feature: At most, 25 tickets can be bought during a single transaction. To preve
     And I request <childNumber> CHILD tickets
     And I request <infantNumber> INFANT tickets
     When a request to purchase tickets is made
-    Then a 200 status should be presented
-    And the receipt of the purchase should be returned
-    And <totalNumber> seats should be reserved
+    Then the receipt of the purchase should be returned
+    And <totalNumber> tickets should have been ordered
+    And the order total should have equalled <totalCost>
+    And <totalSeats> seats should be reserved
 
-    Examples: 
-      | adultNumber | childNumber | infantNumber | totalNumber |
-      | 25          | 0           | 0            | 25          |
-      | 20          | 3           | 2            | 25          |
-      | 10          | 5           | 10           | 25          |
-      | 1           | 24          | 0            | 25          |
+    Examples:
+      | adultNumber | childNumber | infantNumber | totalNumber | totalCost | totalSeats |
+      | 25          | 0           | 0            | 25          | 625       | 25         |
+      | 20          | 3           | 2            | 25          | 545       | 23         |
+      | 10          | 5           | 10           | 25          | 325       | 15         |
+      | 1           | 24          | 0            | 25          | 385       | 25         |
 
   Scenario Outline: When I buy more than 25 tickets, then the transaction fails with a request to
-    reduce the amount of tickets purchased 
+  reduce the amount of tickets purchased
     Given I request <adultNumber> ADULT tickets
     And I request <childNumber> CHILD tickets
     And I request <infantNumber> INFANT tickets
     When a request to purchase tickets is made
-    Then a 400 status exception should be presented
-    And an error showing that <totalNumber> tickets is above the max of 25 should be shown
+    Then an error showing that <totalNumber> tickets is above the max of 25 should be thrown
 
     Examples:
       | adultNumber | childNumber | infantNumber | totalNumber |

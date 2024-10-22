@@ -16,16 +16,17 @@ Given("no tickets are being bought", () => {
 Given(/^I request ([0-9]+) (.*) tickets?$/i, (ticketCount, ticketType) => {
   const parsedCount = parseInt(ticketCount, 10);
   if (parsedCount > 0) {
-    world.ticketRequest.push(new TicketTypeRequest(ticketType, parsedCount));
+    world.ticketRequest.push({ count: parsedCount, type: ticketType });
   }
 });
 
 Given(
   /^I explicitly request ([0-9]+) (.*) tickets?$/i,
   (ticketCount, ticketType) => {
-    world.ticketRequest.push(
-      new TicketTypeRequest(ticketType, parseInt(ticketCount, 10)),
-    );
+    world.ticketRequest.push({
+      count: parseInt(ticketCount, 10),
+      type: ticketType,
+    });
   },
 );
 
