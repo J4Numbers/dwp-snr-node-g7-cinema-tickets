@@ -1,0 +1,6 @@
+{
+  "reports-Dir": ".coverage/c8",
+  "all": true,
+  "exclude": ["src/thirdparty"],
+  "include": "src/"
+}

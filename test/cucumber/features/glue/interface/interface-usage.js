@@ -53,11 +53,14 @@ Then("an error for no tickets purchased should be thrown", () => {
   );
 });
 
-Then("an error that an invalid ticket was presented should be shown", () => {
-  expect(world.exception.message).to.equal(
-    "The ticket you attempted to buy was invalid. The count must be numeric and greater than 0, and the type must be one of 'INFANT', 'CHILD', or 'ADULT'.",
-  );
-});
+Then(
+  /an error that an invalid ticket was presented should be shown with the detail of (.*)/,
+  (errorDetail) => {
+    expect(world.exception.message).to.equal(
+      `Invalid ticket request found. ${errorDetail}`,
+    );
+  },
+);
 
 Then(
   /^an error for requiring at least ([0-9]+) adult tickets? should be thrown$/i,

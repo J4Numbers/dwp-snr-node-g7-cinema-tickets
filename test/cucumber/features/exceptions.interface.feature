@@ -8,21 +8,21 @@ Feature: Assuming this interface is used in the real world, then it is likely th
     should be presented requesting at least one ticket to be purchased.
     Given I explicitly request <number> <type> tickets
     When a request to purchase tickets is made
-    Then an error for no tickets purchased should be thrown
+    Then an error that an invalid ticket was presented should be shown with the detail of <errorDetail>
 
     Examples:
-      | number | type   |
-      | 0      | ADULT  |
-      | 0      | CHILD  |
-      | 0      | INFANT |
+      | number | type   | errorDetail                           |
+      | 0      | ADULT  | count must be a number greater than 0 |
+      | 0      | CHILD  | count must be a number greater than 0 |
+      | 0      | INFANT | count must be a number greater than 0 |
 
   Scenario Outline: When invalid tickets are attempted, then an error giving information on what
     a valid ticket looks like should be provided.
-    Given I request <number> <type> tickets
+    Given I explicitly request <number> <type> tickets
     When a request to purchase tickets is made
-    Then an error that an invalid ticket was presented should be shown
+    Then an error that an invalid ticket was presented should be shown with the detail of <errorDetail>
 
     Examples:
-      | number | type   |
-      | -1     | CHILD  |
-      | 1      | MONKEY |
+      | number | type   | errorDetail                           |
+      | -1     | CHILD  | count must be a number greater than 0 |
+      | 1      | MONKEY | type must be ADULT, CHILD, or INFANT  |

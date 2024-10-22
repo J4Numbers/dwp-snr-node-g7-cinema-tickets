@@ -30,6 +30,46 @@ export default class TicketService {
     return baseMap;
   }
 
+  _validateAccountId(accountId) {
+    if (
+      accountId === undefined ||
+      !Number.isInteger(accountId) ||
+      accountId < 1
+    ) {
+      throw new InvalidPurchaseException(
+        "Account ID must be a non-negative number above 0.",
+      );
+    }
+  }
+
+  _migrateTicketList(ticketPurchaseList) {
+    if (!Array.isArray(ticketPurchaseList)) {
+      throw new InvalidPurchaseException(
+        "Tickets list must be an array of 1 or more elements",
+      );
+    }
+
+    return ticketPurchaseList.map((ticketRequest) => {
+      if (
+        ticketRequest === undefined ||
+        ticketRequest.count === undefined ||
+        !Number.isInteger(ticketRequest.count) ||
+        ticketRequest.count < 1
+      ) {
+        throw new InvalidPurchaseException(
+          "Invalid ticket request found. count must be a number greater than 0",
+        );
+      }
+      try {
+        return new TicketTypeRequest(ticketRequest.type, ticketRequest.count);
+      } catch (e) {
+        throw new InvalidPurchaseException(
+          `Invalid ticket request found. ${e.message}`,
+        );
+      }
+    });
+  }
+
   /**
    * Validate the number of requested tickets is not either 0 or above the
    * maximum number of tickets we're allowed (25 by default).
@@ -78,13 +118,26 @@ export default class TicketService {
    * in line with business rules rather than general exception checking.
    *
    * @private
-   * @param ticketPurchaseMap - The flattened map of all requested tickets
+   * @param accountId {number} - The account number requested for action.
+   * @param ticketPurchaseList {Array} - The list of all requested tickets
+   * @returns {Object} - A flattened map of all requested tickets
    * @throws InvalidPurchaseException - Thrown if a validation error is found
    * in our searching
    */
-  _validateOrder(ticketPurchaseMap) {
+  _validateOrder(accountId, ticketPurchaseList) {
+    this._validateAccountId(accountId);
+    const convertedTickets = this._migrateTicketList(ticketPurchaseList);
+
+    const ticketPurchaseMap = convertedTickets.reduce(this._simplifyTickets, {
+      ADULT: 0,
+      CHILD: 0,
+      INFANT: 0,
+    });
+
     this._validateTicketCount(ticketPurchaseMap);
     this._validateRequiredAdults(ticketPurchaseMap);
+
+    return ticketPurchaseMap;
   }
 
   /**
@@ -149,11 +202,11 @@ export default class TicketService {
    * requesting payment from the user.
    *
    * @private
-   * @param acctNumber {number} - The account number we're looking to charge
+   * @param accountId {number} - The account number we're looking to charge
    * @param totalCost {number} - The total cost (in £) that we're charging
    */
-  _processPayment(acctNumber, totalCost) {
-    this._paymentService.makePayment(acctNumber, totalCost);
+  _processPayment(accountId, totalCost) {
+    this._paymentService.makePayment(accountId, totalCost);
   }
 
   /**
@@ -161,37 +214,31 @@ export default class TicketService {
    * services to ensure that the transaction is booked in.
    *
    * @private
-   * @param acctNumber {number} - The account number that will own the reserved
+   * @param accountId {number} - The account number that will own the reserved
    * seats
    * @param totalSeats {number} - The requested number of reserved seats
    */
-  _processReservation(acctNumber, totalSeats) {
-    this._reservationService.reserveSeat(acctNumber, totalSeats);
+  _processReservation(accountId, totalSeats) {
+    this._reservationService.reserveSeat(accountId, totalSeats);
   }
 
   /**
-   * At this point, some basic validation on our inputs has already taken
-   * place, as we know that we have a valid account ID, and a list of valid
-   * TicketTypeRequests.
+   * Interface for providing two or more data items in order to book a number
+   * of tickets at a cinema.
    *
-   * @param accountId {number} - A valid account ID
-   * @param ticketTypeRequests {TicketTypeRequest} - A list of TicketTypeRequests
+   * @param accountId {number} - An account ID to link against the transactions.
+   * @param ticketTypeRequests {Object} - A list of objects that should
+   * adhere to a TicketTypeRequest.
    * @returns {TicketReservationResponse} The receipt for the reservation as
    * requested by the user
    * @throws InvalidPurchaseException - Thrown if there are business error
    * failures when processing the order.
    */
   purchaseTickets(accountId, ...ticketTypeRequests) {
-    const simplifiedTicketMap = ticketTypeRequests.reduce(
-      this._simplifyTickets,
-      {
-        ADULT: 0,
-        CHILD: 0,
-        INFANT: 0,
-      },
+    const simplifiedTicketMap = this._validateOrder(
+      accountId,
+      ticketTypeRequests,
     );
-
-    this._validateOrder(simplifiedTicketMap);
 
     const ticketReservation =
       this._generateTicketReservationResponse(simplifiedTicketMap);

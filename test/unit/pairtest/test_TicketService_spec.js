@@ -128,7 +128,7 @@ describe("The cinema ticket service", function () {
   describe("Irregular usage of the interface", function () {
     it("Should error when no parameters are provided to the interface", function () {
       expect(() => ticketService.purchaseTickets()).to.throw(
-        /please provide an account ID and tickets to buy/i,
+        /account ID must be a non-negative number above 0/i,
       );
     });
 
@@ -136,19 +136,19 @@ describe("The cinema ticket service", function () {
       it("Should error when a zero account number is provided", function () {
         expect(() =>
           ticketService.purchaseTickets(0, { count: 1, type: "ADULT" }),
-        ).to.throw(/please provide a valid account number/i);
+        ).to.throw(/account ID must be a non-negative number above 0/i);
       });
 
       it("Should error when a negative account number is provided", function () {
         expect(() =>
           ticketService.purchaseTickets(-1, { count: 1, type: "ADULT" }),
-        ).to.throw(/please provide a valid account number/i);
+        ).to.throw(/account ID must be a non-negative number above 0/i);
       });
 
       it("Should error when a non-numeric account number is provided", function () {
         expect(() =>
           ticketService.purchaseTickets("abc", { count: 1, type: "ADULT" }),
-        ).to.throw(/please provide a valid account number/i);
+        ).to.throw(/account ID must be a non-negative number above 0/i);
       });
     });
 
@@ -160,45 +160,59 @@ describe("The cinema ticket service", function () {
         );
       });
 
+      it("Should error when an invalid type for the ticket count is provided", function () {
+        const tickets = [{ count: "5", type: "ADULT" }];
+        expect(() => ticketService.purchaseTickets(1, ...tickets)).to.throw(
+          /invalid ticket request found. count must be a number greater than 0/i,
+        );
+      });
+
+      it("Should error when an invalid type for the ticket type is provided", function () {
+        const tickets = [{ count: 1, type: 1 }];
+        expect(() => ticketService.purchaseTickets(1, ...tickets)).to.throw(
+          /invalid ticket request found. type must be ADULT, CHILD, or INFANT/i,
+        );
+      });
+
       it("Should error when negative ticket requests are provided", function () {
         const tickets = [{ count: -1, type: "ADULT" }];
         expect(() => ticketService.purchaseTickets(1, ...tickets)).to.throw(
-          /invalid ticket request found. please ensure all tickets are of a valid type and have a count above 0./i,
+          /invalid ticket request found. count must be a number greater than 0/i,
         );
       });
 
       it("Should error when 0 tickets are explicitly requested", function () {
         const tickets = [{ count: 0, type: "ADULT" }];
         expect(() => ticketService.purchaseTickets(1, ...tickets)).to.throw(
-          /invalid ticket request found. please ensure all tickets are of a valid type and have a count above 0./i,
+          /invalid ticket request found. count must be a number greater than 0/i,
         );
       });
 
       it("Should error when a blank type is requested", function () {
-        const tickets = [{ count: 0, type: "" }];
+        const tickets = [{ count: 1, type: "" }];
         expect(() => ticketService.purchaseTickets(1, ...tickets)).to.throw(
-          /invalid ticket request found. please ensure all tickets are of a valid type and have a count above 0./i,
+          /invalid ticket request found. type must be ADULT, CHILD, or INFANT/i,
         );
       });
 
       it("Should error when an unknown type is requested", function () {
-        const tickets = [{ count: 0, type: "SENIOR" }];
+        const tickets = [{ count: 1, type: "SENIOR" }];
         expect(() => ticketService.purchaseTickets(1, ...tickets)).to.throw(
-          /invalid ticket request found. please ensure all tickets are of a valid type and have a count above 0./i,
+          /invalid ticket request found. type must be ADULT, CHILD, or INFANT/i,
         );
       });
 
       it("Should error when invalid ticket requests are made with no count", function () {
         const tickets = [{ type: "ADULT" }];
         expect(() => ticketService.purchaseTickets(1, ...tickets)).to.throw(
-          /invalid ticket request found. please ensure all tickets are of a valid type and have a count above 0./i,
+          /invalid ticket request found. count must be a number greater than 0/i,
         );
       });
 
       it("Should error when invalid ticket requests are made with no type", function () {
         const tickets = [{ count: -1 }];
         expect(() => ticketService.purchaseTickets(1, ...tickets)).to.throw(
-          /invalid ticket request found. please ensure all tickets are of a valid type and have a count above 0./i,
+          /invalid ticket request found. count must be a number greater than 0/i,
         );
       });
     });
