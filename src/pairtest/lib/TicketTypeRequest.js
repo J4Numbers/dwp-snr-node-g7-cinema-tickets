@@ -1,3 +1,5 @@
+import { TicketTypeMapping } from "./TicketTypeMapping.js";
+
 /**
  * Immutable Object.
  */
@@ -8,9 +10,9 @@ export default class TicketTypeRequest {
   #noOfTickets;
 
   constructor(type, noOfTickets) {
-    if (!this.#Type.includes(type)) {
+    if (!Object.keys(TicketTypeMapping).includes(type)) {
       throw new TypeError(
-        `type must be ${this.#Type.slice(0, -1).join(", ")}, or ${this.#Type.slice(-1)}`,
+        `type must be ${Object.keys(TicketTypeMapping).slice(0, -1).join(", ")}, or ${Object.keys(TicketTypeMapping).slice(-1)}`,
       );
     }
 
@@ -29,6 +31,4 @@ export default class TicketTypeRequest {
   getTicketType() {
     return this.#type;
   }
-
-  #Type = ["ADULT", "CHILD", "INFANT"];
 }

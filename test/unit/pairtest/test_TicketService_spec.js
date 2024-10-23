@@ -94,6 +94,15 @@ describe("The cinema ticket service", function () {
     });
 
     describe("Max ticket limits", function () {
+      it("Should accept requests for exactly 25 single tickets", function () {
+        const tickets = [{ count: 25, type: "ADULT" }];
+        const receipt = ticketService.purchaseTickets(1, ...tickets);
+
+        expect(receipt.getSeatsReserved()).to.equal(25);
+        expect(receipt.getTotalCost()).to.equal(625);
+        expect(receipt.getTicketsOrdered()).to.equal(25);
+      });
+
       it("Should reject requests for more than 25 single tickets", function () {
         const tickets = [{ count: 26, type: "ADULT" }];
         expect(() => ticketService.purchaseTickets(1, ...tickets)).to.throw(
@@ -128,6 +137,12 @@ describe("The cinema ticket service", function () {
   describe("Irregular usage of the interface", function () {
     it("Should error when no parameters are provided to the interface", function () {
       expect(() => ticketService.purchaseTickets()).to.throw(
+        /account ID must be a non-negative number above 0/i,
+      );
+    });
+
+    it("Should error when null is provided to both parameters", function () {
+      expect(() => ticketService.purchaseTickets(null, null)).to.throw(
         /account ID must be a non-negative number above 0/i,
       );
     });
@@ -173,13 +188,6 @@ describe("The cinema ticket service", function () {
         );
       });
 
-      it("Should error when an invalid type for the ticket type is provided", function () {
-        const tickets = [{ count: 1, type: 1 }];
-        expect(() => ticketService.purchaseTickets(1, ...tickets)).to.throw(
-          /invalid ticket request found. type must be ADULT, CHILD, or INFANT/i,
-        );
-      });
-
       it("Should error when negative ticket requests are provided", function () {
         const tickets = [{ count: -1, type: "ADULT" }];
         expect(() => ticketService.purchaseTickets(1, ...tickets)).to.throw(
@@ -191,6 +199,13 @@ describe("The cinema ticket service", function () {
         const tickets = [{ count: 0, type: "ADULT" }];
         expect(() => ticketService.purchaseTickets(1, ...tickets)).to.throw(
           /invalid ticket request found. count must be a number greater than 0/i,
+        );
+      });
+
+      it("Should error when an invalid type for the ticket type is provided", function () {
+        const tickets = [{ count: 1, type: 1 }];
+        expect(() => ticketService.purchaseTickets(1, ...tickets)).to.throw(
+          /invalid ticket request found. type must be ADULT, CHILD, or INFANT/i,
         );
       });
 

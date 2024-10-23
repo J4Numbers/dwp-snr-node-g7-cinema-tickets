@@ -1,6 +1,7 @@
 import TicketTypeRequest from "./lib/TicketTypeRequest.js";
 import InvalidPurchaseException from "./lib/InvalidPurchaseException.js";
 import TicketReservationResponse from "./lib/TicketReservationResponse.js";
+import { TicketTypeMapping } from "./lib/TicketTypeMapping.js";
 
 export default class TicketService {
   /**
@@ -17,8 +18,27 @@ export default class TicketService {
   }
 
   /**
+   * Return how many tickets we currently have on order of a given type.
+   *
+   * @private
+   * @param ticketPurchaseMap {{[type: string]: number}} - The flatmap of all
+   * tickets we currently have on order.
+   * @param typeToTest {string} - The type we're testing the presence of in our
+   * ticket purchase map.
+   * @returns {number} The number of tickets we currently have on order for
+   * that type. Defauts to 0.
+   */
+  _getTicketsOfType(ticketPurchaseMap, typeToTest) {
+    let ticketsOfType = 0;
+    if (Object.prototype.hasOwnProperty.call(ticketPurchaseMap, typeToTest)) {
+      ticketsOfType = ticketPurchaseMap[typeToTest];
+    }
+    return ticketsOfType;
+  }
+
+  /**
    * Reduction method for collapsing a list of ticket type requests into a
-   * flat map of the three different types.
+   * flat map of the different types.
    *
    * @private
    * @param baseMap - The flattened map we're building up
@@ -26,6 +46,14 @@ export default class TicketService {
    * @returns The ongoing built up base flatmap
    */
   _simplifyTickets(baseMap, ongoingTicket) {
+    if (
+      !Object.prototype.hasOwnProperty.call(
+        baseMap,
+        ongoingTicket.getTicketType(),
+      )
+    ) {
+      baseMap[ongoingTicket.getTicketType()] = 0;
+    }
     baseMap[ongoingTicket.getTicketType()] += ongoingTicket.getNoOfTickets();
     return baseMap;
   }
@@ -126,10 +154,10 @@ export default class TicketService {
    * to supervise the children and infants in the reservation
    */
   _validateRequiredAdults(ticketPurchaseMap) {
-    let adultsRequired =
-      ticketPurchaseMap["INFANT"] > 0 ? ticketPurchaseMap["INFANT"] : 1;
+    let infantTickets = this._getTicketsOfType(ticketPurchaseMap, "INFANT");
+    let adultsRequired = infantTickets > 0 ? infantTickets : 1;
 
-    if (ticketPurchaseMap["ADULT"] < adultsRequired) {
+    if (this._getTicketsOfType(ticketPurchaseMap, "ADULT") < adultsRequired) {
       throw new InvalidPurchaseException(
         `At least ${adultsRequired} adult ticket(s) are required for this transaction`,
       );
@@ -151,11 +179,10 @@ export default class TicketService {
     this._validateAccountId(accountId);
     const convertedTickets = this._migrateTicketList(ticketPurchaseList);
 
-    const ticketPurchaseMap = convertedTickets.reduce(this._simplifyTickets, {
-      ADULT: 0,
-      CHILD: 0,
-      INFANT: 0,
-    });
+    const ticketPurchaseMap = convertedTickets.reduce(
+      this._simplifyTickets,
+      {},
+    );
 
     this._validateTicketCount(ticketPurchaseMap);
     this._validateRequiredAdults(ticketPurchaseMap);
@@ -186,7 +213,12 @@ export default class TicketService {
    * @returns {number} The total order cost of all requested tickets
    */
   _calculateOrderCost(ticketPurchaseMap) {
-    return ticketPurchaseMap["ADULT"] * 25 + ticketPurchaseMap["CHILD"] * 15;
+    return Object.keys(ticketPurchaseMap).reduce((totalCost, ticketType) => {
+      return (
+        totalCost +
+        ticketPurchaseMap[ticketType] * TicketTypeMapping[ticketType]
+      );
+    }, 0);
   }
 
   /**
@@ -199,7 +231,10 @@ export default class TicketService {
    * this transaction
    */
   _calculateTotalSeats(ticketPurchaseMap) {
-    return ticketPurchaseMap["ADULT"] + ticketPurchaseMap["CHILD"];
+    return (
+      this._getTicketsOfType(ticketPurchaseMap, "ADULT") +
+      this._getTicketsOfType(ticketPurchaseMap, "CHILD")
+    );
   }
 
   /**

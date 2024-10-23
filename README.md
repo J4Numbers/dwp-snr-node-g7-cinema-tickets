@@ -49,3 +49,14 @@ To run the tests within this repository, the following command can be used:
 ```bash
 npm t
 ```
+
+## Future iterations
+
+* Extract TicketTypeMapping into a configuration file or database for dynamic loading
+* Tie the interface to an OpenAPI3 spec for deployment
+* Extend `TicketTypeMapping` to classify a type with the following criteria
+  * `requiresSupervision` to mark whether a ticket holder requires supervision
+  * `canSuperviseOthers` to mark whether a ticket holder can supervise others
+  * `requiresSeat` to mark whether a ticket holder requires a dedicated seat reservation
+  * `supervisorRatio` to allow for customisation for children and/or infants where a ratio of
+    supervisors must be adhered to
